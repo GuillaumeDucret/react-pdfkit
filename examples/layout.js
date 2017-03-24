@@ -1,6 +1,6 @@
 import fs from 'fs'
 import React from 'react'
-import ReactPDF from '../'
+import ReactPDF from '../src/ReactPDF'
 import lorem from './resources/lorem'
 
 const styles = {

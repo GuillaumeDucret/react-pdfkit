@@ -1,19 +1,17 @@
 {
-  "name": "react-pdfkit",
-  "version": "0.1.0",
+  "name": "@ducret201/react-pdfkit",
+  "version": "0.1.1",
   "description": "React renderer to generate PDF documents with pdfkit",
   "main": "./index.js",
   "scripts": {
+    "build": "babel src -d lib",
+    "prepublish": "npm run build",
     "examples": "node ./examples"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/ducret201/react-pdfkit.git"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "README.md"
-  ],
   "keywords": [
     "react",
     "reactjs",
@@ -28,14 +26,15 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-register": "^6.16.3",
-    "react": "^0.14.8"
+    "babel-cli": "^6.16.0",
+    "react": "^0.14.8",
+    "pdfkit": "^0.8.0"
   },
   "peerDependencies": {
     "react": "^0.14.8"
   },
   "dependencies": {
-    "fbjs": "^0.8.4",
-    "pdfkit": "^0.8.0"
+    "fbjs": "^0.8.4"
   },
   "homepage": "https://github.com/ducret201/react-pdfkit#readme"
 }
