@@ -1,47 +1,51 @@
+import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
 import {computeMargins, computeWidth, computeHeight} from './layout'
 
 export default function(element, context, next) {
-    const {children, width, ...props} = element.props
+    const {children, x, y, width, height, gravity, margin, margins, ...props} = element.props
     const {doc, layout} = context
 
-    const position = layout({width})
-    const margins = computeMargins(props)
-    var innerHeight = 0
+    const position = layout({x, y, width, height, gravity})
+    const computedMargins = computeMargins(margin, margins)
 
-    function computeInnerHeight(height, y) {
-        var newInnerHeight = 0
-        if (doc.y == position.y + margins.top) {
-            // doc.y didn't move
-            newInnerHeight = height + y
-        } else {
-            // doc.y moved
-            newInnerHeight = doc.y - position.y - margins.top
-        }
+    var innerHeight = position.height - computedMargins.top - computedMargins.bottom
+
+    function computeInnerHeight(height) {
+        const newInnerHeight = doc.y + height - position.y - computedMargins.top
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
     function nextLayout({x = 0, y = 0, width, height}) {
+        const computedWidth = computeWidth(position, computedMargins, undefined, width)
+        const computedHeight = computeHeight(innerHeight, height)
+
         return {
-            x: position.x + margins.left + x,
-            y: position.y + margins.top + y,
-            width: computeWidth(position, margins, width),
-            height: computeHeight(innerHeight, height),
+            x: doc.x = position.x + computedMargins.left + x,
+            y: doc.y = position.y + computedMargins.top + y,
+            width: computedWidth,
+            height: computedHeight,
             after: function() {
-                innerHeight = computeInnerHeight(this.height, y)
-                doc.x = position.x + margins.left
-                doc.y = position.y + margins.top
+                innerHeight = computeInnerHeight(this.height)
+                doc.x = position.x + computedMargins.left
+                doc.y = position.y + computedMargins.top
             }
         }
     }
 
     // before
-    doc.x = position.x + margins.left
-    doc.y = position.y + margins.top
+    doc.x = position.x + computedMargins.left
+    doc.y = position.y + computedMargins.top
+
+    doc.save()
+    const snapshot = applyDocProperties(doc, props)
 
     next({layout: nextLayout})
 
+    revertDocProperties(doc, snapshot)
+    doc.restore()
+
     // after
-    doc.x = position.x + margins.left
-    doc.y = position.y + innerHeight + margins.top + margins.bottom
+    doc.x = position.x
+    doc.y = !position.height && (position.y + innerHeight + computedMargins.top + computedMargins.bottom) || position.y
     position.after()
 }

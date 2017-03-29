@@ -16,11 +16,6 @@ function render(nextElement, stream) {
                 'render(): You must pass a valid ReactElement.'
             )
 
-            invariant(
-                nextElement.type == 'document',
-                'Root element shoud be of type "document"'
-            )
-
             const rootId = ReactInstanceHandles.createReactRootID(0)
             const component = instantiateReactComponent(nextElement)
 

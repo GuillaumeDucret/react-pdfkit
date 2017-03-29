@@ -1,19 +1,29 @@
-import {computeMargins, computeWidth, computeHeight} from './layout'
+import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
+import {computeMargins, computeGravity, computeDivider, computeWidth, computeHeight} from './layout'
 
 export default function(element, context, next) {
-    const {children, width, orientation, ...props} = element.props
+    const {children, x, y, width, height, gravity, orientation, margin, margins, divider, ...props} = element.props
     const {doc, layout} = context
 
-    const position = layout({width})
-    const margins = computeMargins(props)
-    var innerHeight = 0
+    const position = layout({x, y, width, height, gravity})
+    const computedMargins = computeMargins(margin, margins)
+    const computedDivider = computeDivider(children, orientation, divider)
+
+    var innerHeight = position.height - computedMargins.top - computedMargins.bottom
+    var layoutIndex = -1
 
     function computeInnerHeight(height) {
-        const newInnerHeight = doc.y + height - position.y - margins.top
+        const newInnerHeight = doc.y + height - position.y - computedMargins.top
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
-    function nextLayout({x, y, width, height}) {
+    function nextLayout({x, y, width, height, gravity}) {
+        const computedWidth = computeWidth(position, computedMargins, computedDivider, width)
+        const computedHeight = computeHeight(innerHeight, height)
+        const computedGravity = computeGravity(position, innerHeight, orientation, gravity, computedWidth, computedHeight)
+
+        layoutIndex++
+
         if (x != null && y != null) {
             // absolute layout
             return layout({x, y, width, height})
@@ -22,10 +32,10 @@ export default function(element, context, next) {
         if (orientation == 'horizontal') {
             // horizontal linear layout
             return {
-                x: doc.x,
-                y: position.y + margins.top,
-                width: computeWidth(position, margins, width),
-                height: computeHeight(innerHeight, height),
+                x: doc.x = doc.x + (layoutIndex > 0 && computedDivider.width),
+                y: doc.y = position.y + computedMargins.top + computedGravity.top,
+                width: computedWidth,
+                height: computedHeight,
                 after: function() {
                     innerHeight = computeInnerHeight(this.height)
                     doc.x = doc.x + this.width
@@ -36,10 +46,10 @@ export default function(element, context, next) {
 
         // vertical linear layout
         return {
-            x: position.x + margins.left,
-            y: doc.y,
-            width: computeWidth(position, margins, width),
-            height: computeHeight(innerHeight, height),
+            x: doc.x = position.x + computedMargins.left + computedGravity.left,
+            y: doc.y = doc.y + (layoutIndex > 0 && computedDivider.height),
+            width: computedWidth,
+            height: computedHeight,
             after: function() {
                 innerHeight = computeInnerHeight(this.height)
                 doc.x = this.x
@@ -49,13 +59,19 @@ export default function(element, context, next) {
     }
 
     // before
-    doc.x = position.x + margins.left
-    doc.y = position.y + margins.top
+    doc.x = position.x + computedMargins.left
+    doc.y = position.y + computedMargins.top
+
+    doc.save()
+    const snapshot = applyDocProperties(doc, props)
 
     next({layout: nextLayout})
 
+    revertDocProperties(doc, snapshot)
+    doc.restore()
+    
     // after
-    doc.x = position.x + margins.left
-    doc.y = position.y + innerHeight + margins.top + margins.bottom
+    doc.x = position.x
+    doc.y = !position.height && (position.y + innerHeight + computedMargins.top + computedMargins.bottom) || position.y
     position.after()
 }

@@ -21,7 +21,8 @@ const doc = (
                 y={300}
                 width={200} />
             <linearLayout
-                margins={({top: 20, bottom: 20})}>
+                margins={({top: 20, bottom: 20})}
+                divider={10}>
                 <rect
                     width={50}
                     height={50}
@@ -30,6 +31,7 @@ const doc = (
                 <rect
                     width='50%'
                     height='100%'
+                    gravity='center'
                     {...styles.rect} />
             </linearLayout>
             <text align='center'>~ Lorem ipsum 1 ~</text>
@@ -51,7 +53,8 @@ const doc = (
                 <text width='30%'>{lorem.short}</text>
                 <rect
                     width='30%'
-                    height='100%'
+                    height='50%'
+                    gravity='center'
                     {...styles.rect} />
             </linearLayout>
             <text align='center'>~ Lorem ipsum 2 ~</text>
