@@ -17,24 +17,33 @@ export function computeDivider(children, orientation, divider) {
     }
 }
 
-export function computeGravity(position, innerHeight, orientation, gravity, width, height) {
-    switch(gravity) {
-        case 'center':
-            return {
-                top: orientation == 'horizontal' && (innerHeight / 2 - height / 2) || 0,
-                left: orientation != 'horizontal' && (position.width / 2 - width / 2) || 0
-            }
-        case 'end':
-            return {
-                top: orientation == 'horizontal' && (innerHeight - height) || 0,
-                left: orientation != 'horizontal' && (position.width - width) || 0
-            }
-        default:
-            return {
-                top: 0,
-                left: 0
-            }
-    }
+export function computeGravity(position, innerHeight, orientation, gravity = '', width, height) {
+    return gravity.split('|').reduce((result, gravity) => {
+        switch(gravity) {
+            case 'center':
+                return {
+                    top: orientation == 'horizontal' && (innerHeight / 2 - height / 2) || result.top,
+                    left: orientation != 'horizontal' && (position.width / 2 - width / 2) || result.left
+                }
+            case 'end':
+                return {
+                    top: orientation == 'horizontal' && (innerHeight - height) || result.top,
+                    left: orientation != 'horizontal' && (position.width - width) || result.left
+                }
+            case 'right':
+                return {
+                    top: result.top,
+                    left: position.width - width
+                }
+            case 'bottom':
+                return {
+                    top: innerHeight - height,
+                    left: result.left
+                }
+            default:
+                return result
+        }
+    }, {top: 0, left: 0})
 }
 
 export function computeWidth(position, margins, divider = {width: 0, count: 0}, width) {

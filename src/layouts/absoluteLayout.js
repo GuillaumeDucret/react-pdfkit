@@ -1,5 +1,5 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins, computeWidth, computeHeight} from './layout'
+import {computeMargins, computeGravity, computeWidth, computeHeight} from './layout'
 
 export default function(element, context, next) {
     const {children, x, y, width, height, gravity, margin, margins, ...props} = element.props
@@ -15,13 +15,14 @@ export default function(element, context, next) {
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
-    function nextLayout({x = 0, y = 0, width, height}) {
+    function nextLayout({x = 0, y = 0, width, height, gravity}) {
         const computedWidth = computeWidth(position, computedMargins, undefined, width)
         const computedHeight = computeHeight(innerHeight, height)
+        const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {
-            x: doc.x = position.x + computedMargins.left + x,
-            y: doc.y = position.y + computedMargins.top + y,
+            x: doc.x = position.x + computedMargins.left + computedGravity.left + x,
+            y: doc.y = position.y + computedMargins.top + computedGravity.top + y,
             width: computedWidth,
             height: computedHeight,
             after: function() {

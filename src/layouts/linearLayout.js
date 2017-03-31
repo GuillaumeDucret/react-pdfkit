@@ -24,7 +24,7 @@ export default function(element, context, next) {
 
         layoutIndex++
 
-        if (x != null && y != null) {
+        if (x != null || y != null) {
             // absolute layout
             return layout({x, y, width, height})
         }

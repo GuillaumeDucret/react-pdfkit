@@ -1,4 +1,4 @@
-import {computeWidth, computeDivider, computeGravity} from '../layouts/layout'
+import {computeDivider, computeGravity, computeWidth, computeHeight} from '../layouts/layout'
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context, next) {
@@ -13,21 +13,27 @@ export default function(element, context, next) {
     const position = {
         x: 0,
         y: 0,
-        width: page.width
+        width: page.width,
+        height: page.height
     }
 
+    var innerHeight = position.height - margins.top - margins.bottom
     var linearLayoutIndex = -1
 
-    function layout({x, y, width, height = 0, gravity}) {
-        if (x != null && y != null) {
+    function layout({x, y, width, height, gravity}) {
+        if (x != null || y != null) {
             // absolute layout
+            x = x || 0
+            y = y || 0
             const computedWidth = computeWidth(position, margins, undefined, width)
+            const computedHeight = computeHeight(innerHeight, height)
+            const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
             return {
-                x: position.x + margins.left + x,
-                y: position.y + margins.top + y,
+                x: position.x + margins.left + computedGravity.left + x,
+                y: position.y + margins.top + computedGravity.top + y,
                 width: computedWidth,
-                height: height,
+                height: computedHeight,
                 after: function() {
                 }
             }
@@ -37,13 +43,14 @@ export default function(element, context, next) {
 
         // linear layout
         const computedWidth = computeWidth(position, margins, computedDivider, width)
-        const computedGravity = computeGravity(position, undefined, undefined, gravity, computedWidth, undefined)
+        const computedHeight = computeHeight(innerHeight, height)
+        const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {
             x: doc.x = position.x + margins.left + computedGravity.left,
             y: doc.y = doc.y + (linearLayoutIndex > 0 && computedDivider.height),
             width: computedWidth,
-            height: height,
+            height: computedHeight,
             after: function() {
                 doc.x = this.x
                 doc.y = doc.y + this.height
@@ -53,7 +60,7 @@ export default function(element, context, next) {
 
     // before
     doc.x = position.x + margins.left
-    doc.y = position.y + page.margins.top
+    doc.y = position.y + margins.top
 
     doc.save()
     const snapshot = applyDocProperties(doc, props)
@@ -65,5 +72,5 @@ export default function(element, context, next) {
 
     // after
     doc.x = position.x
-    doc.y = doc.y + margins.bottom
+    doc.y = position.y + position.height
 }
