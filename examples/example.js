@@ -3,12 +3,6 @@ import React from 'react'
 import ReactPDF from '../src/ReactPDF'
 import lorem from './resources/lorem'
 
-const styles = {
-    rect: {
-        fillOpacity: 0.2
-    }
-}
-
 const doc = (
     <document
         title='example'
@@ -32,7 +26,7 @@ const doc = (
                     <rect
                         height='100%'
                         cornerRadius={10}
-                        {...styles.rect} />
+                        fillOpacity={0.2} />
                     <image
                         src='examples/resources/img/react.png'
                         x={4}
@@ -48,7 +42,7 @@ const doc = (
                     <rect
                         height='100%'
                         cornerRadius={10}
-                        {...styles.rect} />
+                        fillOpacity={0.2} />
                     <image
                         src='examples/resources/img/react.png'
                         x={4}

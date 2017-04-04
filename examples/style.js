@@ -26,7 +26,9 @@ const doc = (
                     font='Times-Roman'>
                     {lorem.short}
                 </text>
-                <textLayout>
+                <textLayout
+                    gravity='center'
+                    width='80%'>
                     <text
                         font='*-Bold'>
                         ~ Lorem ipsum 1 ~

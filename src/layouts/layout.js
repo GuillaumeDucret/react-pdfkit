@@ -46,7 +46,7 @@ export function computeGravity(position, innerHeight, orientation, gravity = '',
     }, {top: 0, left: 0})
 }
 
-export function computeWidth(position, margins, divider = {width: 0, count: 0}, width) {
+export function computeWidth(position, margins, divider = {width: 0, count: 0}, width, scale = 1) {
     if (width == null) {
         return position.width - margins.left - margins.right
     }
@@ -56,10 +56,10 @@ export function computeWidth(position, margins, divider = {width: 0, count: 0}, 
         return (position.width - margins.left - margins.right - (divider.width * divider.count)) * percentWidth / 100
     }
 
-    return width
+    return width * scale
 }
 
-export function computeHeight(innerHeight, height) {
+export function computeHeight(innerHeight, height, scale = 1) {
     if (height == null) {
         return 0
     }
@@ -69,5 +69,5 @@ export function computeHeight(innerHeight, height) {
         return innerHeight * percentHeight / 100
     }
 
-    return height
+    return height * scale
 }

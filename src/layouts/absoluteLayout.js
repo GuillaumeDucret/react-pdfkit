@@ -15,9 +15,9 @@ export default function(element, context, next) {
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
-    function nextLayout({x = 0, y = 0, width, height, gravity}) {
-        const computedWidth = computeWidth(position, computedMargins, undefined, width)
-        const computedHeight = computeHeight(innerHeight, height)
+    function nextLayout({x = 0, y = 0, width, height, gravity, scale}) {
+        const computedWidth = computeWidth(position, computedMargins, undefined, width, scale)
+        const computedHeight = computeHeight(innerHeight, height, scale)
         const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {

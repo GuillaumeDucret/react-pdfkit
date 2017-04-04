@@ -3,12 +3,6 @@ import React from 'react'
 import ReactPDF from '../src/ReactPDF'
 import lorem from './resources/lorem'
 
-const styles = {
-    rect: {
-        fillOpacity: 0.2
-    }
-}
-
 const doc = (
     <document
         title='Layout'
@@ -23,16 +17,17 @@ const doc = (
             <linearLayout
                 margins={({top: 20, bottom: 20})}
                 divider={10}>
-                <rect
-                    width={50}
+                <path
+                    width={100}
                     height={50}
-                    {...styles.rect} />
+                    path='M 0 50 A 25 25 0 0 1 100 50 Z'
+                    fillOpacity={0.2} />
                 <text>{lorem.short}</text>
                 <rect
+                    gravity='center'
                     width='50%'
                     height='100%'
-                    gravity='center'
-                    {...styles.rect} />
+                    fillOpacity={0.2} />
             </linearLayout>
             <text align='center'>~ Lorem ipsum 1 ~</text>
         </page>
@@ -46,16 +41,17 @@ const doc = (
             <linearLayout
                 orientation='horizontal'
                 margins={({top: 20, bottom: 20})}>
-                <rect
-                    width={50}
+                <path
+                    width={100}
                     height={50}
-                    {...styles.rect} />
+                    path='M 0 50 A 25 25 0 0 1 100 50 Z'
+                    fillOpacity={0.2} />
                 <text width='30%'>{lorem.short}</text>
                 <rect
                     width='30%'
                     height='50%'
                     gravity='center'
-                    {...styles.rect} />
+                    fillOpacity={0.2} />
             </linearLayout>
             <text align='center'>~ Lorem ipsum 2 ~</text>
         </page>
@@ -68,10 +64,11 @@ const doc = (
                 width={200} />
             <absoluteLayout
                 margins={({top: 20, bottom: 20})}>
-                <rect
-                    width={50}
+                <path
+                    width={100}
                     height={50}
-                    {...styles.rect} />
+                    path='M 0 50 A 25 25 0 0 1 100 50 Z'
+                    fillOpacity={0.2} />
                 <text
                     x={100}
                     y={100}
@@ -83,7 +80,7 @@ const doc = (
                     y={100}
                     width='30%'
                     height='100%'
-                    {...styles.rect} />
+                    fillOpacity={0.2} />
             </absoluteLayout>
             <text align='center'>~ Lorem ipsum 3 ~</text>
         </page>
@@ -103,7 +100,7 @@ const doc = (
                     x={0}
                     y={0}
                     height='100%'
-                    {...styles.rect} />
+                    fillOpacity={0.2} />
             </absoluteLayout>
             <text align='center'>~ Lorem ipsum 4 ~</text>
         </page>

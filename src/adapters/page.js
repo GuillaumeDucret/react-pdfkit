@@ -20,13 +20,13 @@ export default function(element, context, next) {
     var innerHeight = position.height - margins.top - margins.bottom
     var linearLayoutIndex = -1
 
-    function layout({x, y, width, height, gravity}) {
+    function layout({x, y, width, height, gravity, scale}) {
         if (x != null || y != null) {
             // absolute layout
             x = x || 0
             y = y || 0
-            const computedWidth = computeWidth(position, margins, undefined, width)
-            const computedHeight = computeHeight(innerHeight, height)
+            const computedWidth = computeWidth(position, margins, undefined, width, scale)
+            const computedHeight = computeHeight(innerHeight, height, scale)
             const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
             return {
@@ -42,8 +42,8 @@ export default function(element, context, next) {
         linearLayoutIndex++
 
         // linear layout
-        const computedWidth = computeWidth(position, margins, computedDivider, width)
-        const computedHeight = computeHeight(innerHeight, height)
+        const computedWidth = computeWidth(position, margins, computedDivider, width, scale)
+        const computedHeight = computeHeight(innerHeight, height, scale)
         const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {

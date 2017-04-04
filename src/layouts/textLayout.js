@@ -1,5 +1,5 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins} from './layout'
+import {computeMargins, computeWidth} from './layout'
 
 export default function(element, context, next) {
     const {children, x, y, width, gravity, margin, margins, ...props} = element.props
@@ -8,10 +8,13 @@ export default function(element, context, next) {
     const position = layout({x, y, width, gravity})
     const computedMargins = computeMargins(margin, margins)
 
-    function nextLayout() {
+    function nextLayout({width, height}) {
+        const computedWidth = computeWidth(position, computedMargins, undefined, width, undefined)
+
         return {
             x: doc.x,
             y: doc.y,
+            width: computedWidth,
             option: {
                 continued: true
             },
