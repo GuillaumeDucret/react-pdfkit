@@ -1,16 +1,18 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins, computeGravity, computeDivider, computeWidth, computeHeight} from './layout'
+import {computeMargins, computeGravity, computeDivider, computeWidth, computeHeight, computeScale} from './layout'
 
 export default function(element, context, next) {
     const {children, x, y, width, height, gravity, orientation, margin, margins, divider, ...props} = element.props
-    const {doc, layout} = context
+    const {doc, layout, pageBreak} = context
 
-    const position = layout({x, y, width, height, gravity})
     const computedMargins = computeMargins(margin, margins)
     const computedDivider = computeDivider(children, orientation, divider)
 
-    var innerHeight = position.height - computedMargins.top - computedMargins.bottom
-    var layoutIndex = -1
+    // init
+    var position
+    var innerHeight
+    var layoutIndex
+    var snapshot
 
     function computeInnerHeight(height) {
         const newInnerHeight = doc.y + height - position.y - computedMargins.top
@@ -18,8 +20,9 @@ export default function(element, context, next) {
     }
 
     function nextLayout({x, y, width, height, gravity, scale}) {
-        const computedWidth = computeWidth(position, computedMargins, computedDivider, width, scale)
-        const computedHeight = computeHeight(innerHeight, height, scale)
+        const computedScale = computeScale(position, computedMargins, computedDivider, width, scale)
+        const computedWidth = computeWidth(position, computedMargins, computedDivider, width, computedScale)
+        const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
         const computedGravity = computeGravity(position, innerHeight, orientation, gravity, computedWidth, computedHeight)
 
         layoutIndex++
@@ -36,6 +39,7 @@ export default function(element, context, next) {
                 y: doc.y = position.y + computedMargins.top + computedGravity.top,
                 width: computedWidth,
                 height: computedHeight,
+                scale: computedScale,
                 after: function() {
                     innerHeight = computeInnerHeight(this.height)
                     doc.x = doc.x + this.width
@@ -50,6 +54,7 @@ export default function(element, context, next) {
             y: doc.y = doc.y + (layoutIndex > 0 && computedDivider.height),
             width: computedWidth,
             height: computedHeight,
+            scale: computedScale,
             after: function() {
                 innerHeight = computeInnerHeight(this.height)
                 doc.x = this.x
@@ -58,20 +63,47 @@ export default function(element, context, next) {
         }
     }
 
-    // before
-    doc.x = position.x + computedMargins.left
-    doc.y = position.y + computedMargins.top
+    function nextPageBreak(pos, beforePageBreak, afterPageBreak) {
+        return pageBreak(pos, () => {
+            beforePageBreak()
+            after()
+        }, () => {
+            before()
+            afterPageBreak()
+        })
+    }
 
-    doc.save()
-    const snapshot = applyDocProperties(doc, props)
+    function nextLayoutWithPageBreak(option) {
+        var position = nextLayout(option)
+        
+        if (nextPageBreak(position, () => {}, () => {})) {
+            position = nextLayout(option)
+        }
+        return position
+    }
 
-    next({layout: nextLayout})
+    function before() {
+        position = layout({x, y, width, height, gravity})
+        innerHeight = position.height - computedMargins.top - computedMargins.bottom
+        layoutIndex = -1
 
-    revertDocProperties(doc, snapshot)
-    doc.restore()
-    
-    // after
-    doc.x = position.x
-    doc.y = !position.height && (position.y + innerHeight + computedMargins.top + computedMargins.bottom) || position.y
-    position.after()
+        doc.x = position.x + computedMargins.left
+        doc.y = position.y + computedMargins.top
+
+        doc.save()
+        snapshot = applyDocProperties(doc, props)
+    }
+
+    function after() {
+        revertDocProperties(doc, snapshot)
+        doc.restore()
+        
+        doc.x = position.x
+        doc.y = !position.height && (position.y + innerHeight + computedMargins.top + computedMargins.bottom) || position.y
+        position.after()
+    }
+
+    before()
+    next({layout: nextLayoutWithPageBreak, pageBreak: nextPageBreak})
+    after()
 }

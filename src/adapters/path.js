@@ -10,7 +10,7 @@ export default function(element, context) {
     const snapshot = applyDocProperties(doc, props)
 
     doc.translate(position.x, position.y)
-    doc.scale(scale)
+    doc.scale(position.scale)
     doc.path(path).fillAndStroke()
 
     revertDocProperties(doc, snapshot)

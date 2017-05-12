@@ -41,11 +41,22 @@ const doc = (
             <linearLayout
                 orientation='horizontal'
                 margins={({top: 20, bottom: 20})}>
-                <path
+                <pathLayout
                     width={100}
                     height={50}
-                    path='M 0 50 A 25 25 0 0 1 100 50 Z'
-                    fillOpacity={0.2} />
+                    scale='30%'>
+                    <path
+                        path='M 0 50 A 25 25 0 0 1 100 50 Z'
+                        fillOpacity={0.2} />
+                    <text
+                        x={100 / 2}
+                        y={50 / 2}
+                        width={100}
+                        gravity='center'
+                        align='center'>
+                        ~~~~~
+                    </text>
+                </pathLayout>
                 <text width='30%'>{lorem.short}</text>
                 <rect
                     width='30%'

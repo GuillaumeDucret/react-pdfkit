@@ -46,7 +46,7 @@ export function computeGravity(position, innerHeight, orientation, gravity = '',
     }, {top: 0, left: 0})
 }
 
-export function computeWidth(position, margins, divider = {width: 0, count: 0}, width, scale = 1) {
+export function computeWidth(position, margins = {top: 0, bottom: 0, left: 0, right: 0}, divider = {width: 0, count: 0}, width, scale = 1) {
     if (width == null) {
         return position.width - margins.left - margins.right
     }
@@ -59,7 +59,7 @@ export function computeWidth(position, margins, divider = {width: 0, count: 0}, 
     return width * scale
 }
 
-export function computeHeight(innerHeight, height, scale = 1) {
+export function computeHeight(innerHeight, height, width, scale = 1) {
     if (height == null) {
         return 0
     }
@@ -69,5 +69,27 @@ export function computeHeight(innerHeight, height, scale = 1) {
         return innerHeight * percentHeight / 100
     }
 
+    if (typeof height == 'function') {
+        return height(width)
+    }
+
     return height * scale
+}
+
+export function computeScale(position, margins = {top: 0, bottom: 0, left: 0, right: 0}, divider = {width: 0, count: 0}, width, scale) {
+    if (scale == null) {
+        return 1
+    }
+
+    if (typeof scale == 'string' && scale[scale.length - 1] == '%') {
+
+        if (width == null || typeof width != 'number') {
+            return 1    
+        }
+
+        const percentScale = parseInt(scale.slice(0, scale.length - 1))
+        return (position.width - margins.left - margins.right - (divider.width * divider.count)) / width * percentScale / 100
+    }
+
+    return scale
 }

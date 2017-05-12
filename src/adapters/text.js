@@ -4,11 +4,16 @@ export default function(element, context, next) {
     const {children, x, y, width, height, gravity, ...props} = element.props
     const {doc, layout} = context
 
-    const childNodes = next()
-    const position = layout({x, y, width, height, gravity})
-
     doc.save()
     const snapshot = applyDocProperties(doc, props)
+
+    const childNodes = next()
+
+    function computeHeight(width) {
+        return doc.heightOfString(childNodes.join(''), {width, ...props})
+    }
+
+    const position = layout({x, y, width, height: height || computeHeight, gravity})
 
     doc.text(childNodes.join(''), position.x, position.y, {width: position.width, ...props, ...position.option})
     doc.y = !position.height && doc.y || position.y

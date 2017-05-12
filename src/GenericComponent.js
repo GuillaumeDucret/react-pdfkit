@@ -21,14 +21,11 @@ const GenericComponentMixin = {
         const element = this._currentElement
         const {children, ...props} = element.props
 
-        const next = (parentContext) => {
-            var nextContext
-            if (parentContext) {
-                nextContext = {...context, ...parentContext}
-            } else {
-                nextContext = context
-            }
-            return this.mountChildren(children, transaction, nextContext)
+        const next = (parentContext, filter) => {
+            const nextContext = parentContext && {...context, ...parentContext} || context
+            const filteredChildren = filter && children.filter && children.filter(filter) || children
+
+            return this.mountChildren(filteredChildren, transaction, nextContext)
         }
 
         const mount = adapters[element.type] || layouts[element.type]
