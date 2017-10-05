@@ -1,6 +1,6 @@
 {
   "name": "@ducret201/react-pdfkit",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "React renderer to generate PDF documents with pdfkit",
   "main": "./index.js",
   "scripts": {
