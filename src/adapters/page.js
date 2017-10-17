@@ -29,7 +29,7 @@ export default function(element, context, next) {
             const computedScale = computeScale(position, margins, undefined, width, scale)
             const computedWidth = computeWidth(position, margins, undefined, width, computedScale)
             const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-            const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
+            const computedGravity = computeGravity(position, margins, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
             return {
                 x: position.x + margins.left + computedGravity.left + x,
@@ -48,7 +48,7 @@ export default function(element, context, next) {
         const computedScale = computeScale(position, margins, computedDivider, width, scale)
         const computedWidth = computeWidth(position, margins, computedDivider, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-        const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
+        const computedGravity = computeGravity(position, margins, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {
             x: doc.x = position.x + margins.left + computedGravity.left,
@@ -81,7 +81,7 @@ export default function(element, context, next) {
     function layoutWithPageBreak(option) {
         var position = layout(option)
         
-        if (pageBreak(position)) {
+        if (pageBreak(position, () => {}, () => {})) {
             position = layout(option)
         }
         return position

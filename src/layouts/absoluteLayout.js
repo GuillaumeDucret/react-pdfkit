@@ -25,7 +25,7 @@ export default function(element, context, next) {
         const computedScale = computeScale(position, computedMargins, undefined, width, scale)
         const computedWidth = computeWidth(position, computedMargins, undefined, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-        const computedGravity = computeGravity(position, innerHeight, undefined, gravity, computedWidth, computedHeight)
+        const computedGravity = computeGravity(position, computedMargins, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {
             x: doc.x = position.x + computedMargins.left + computedGravity.left + x,

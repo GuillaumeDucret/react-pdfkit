@@ -23,7 +23,7 @@ export default function(element, context, next) {
         const computedScale = computeScale(position, computedMargins, computedDivider, width, scale)
         const computedWidth = computeWidth(position, computedMargins, computedDivider, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-        const computedGravity = computeGravity(position, innerHeight, orientation, gravity, computedWidth, computedHeight)
+        const computedGravity = computeGravity(position, computedMargins, innerHeight, orientation, gravity, computedWidth, computedHeight)
 
         layoutIndex++
 
