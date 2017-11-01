@@ -1,7 +1,7 @@
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context) {
-    const {children, x, y, width, height, gravity, scale = 1, path, ...props} = element.props
+    const {children, x, y, width, height, gravity, scale = 1, lineWidth = 1, path, ...props} = element.props
     const {doc, layout} = context
 
     const position = layout({x, y, width, height, gravity, scale})
@@ -11,6 +11,7 @@ export default function(element, context) {
 
     doc.translate(position.x, position.y)
     doc.scale(position.scale)
+    doc.lineWidth(lineWidth / position.scale) // revert to initial line width
     doc.path(path).fillAndStroke()
 
     revertDocProperties(doc, snapshot)
