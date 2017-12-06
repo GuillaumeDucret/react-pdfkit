@@ -1,7 +1,7 @@
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context) {
-    const {children, x, y, width, height, gravity, cornerRadius, ...props} = element.props
+    const {children, x, y, width, height, cornerRadius, gravity, ...props} = element.props
     const {doc, layout} = context
 
     const position = layout({x, y, width, height, gravity})
