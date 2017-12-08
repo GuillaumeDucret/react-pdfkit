@@ -2,10 +2,10 @@ import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
 import {computeMargins, computeWidth} from './layout'
 
 export default function(element, context, next) {
-    const {children, x, y, width, gravity, margin, margins, ...props} = element.props
+    const {children, x, y, width, height, gravity, margin, margins, ...props} = element.props
     const {doc, layout} = context
 
-    const position = layout({x, y, width, gravity})
+    const position = layout({x, y, width, height, gravity})
     const computedMargins = computeMargins(margin, margins)
 
     function nextLayout({width, height}) {

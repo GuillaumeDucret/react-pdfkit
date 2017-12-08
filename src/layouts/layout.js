@@ -30,6 +30,16 @@ export function computeGravity(position, margins = {top: 0, bottom: 0, left: 0, 
                     top: orientation == 'horizontal' && (innerHeight - height) || result.top,
                     left: orientation != 'horizontal' && (position.width - margins.left - margins.right - width) || result.left
                 }
+            case 'center_horizontal':
+                return {
+                    top: result.top,
+                    left: (position.width - margins.left - margins.right) / 2 - width / 2
+                }
+            case 'center_vertical':
+                return {
+                    top: innerHeight / 2 - height / 2,
+                    left: result.left
+                }
             case 'right':
                 return {
                     top: result.top,
