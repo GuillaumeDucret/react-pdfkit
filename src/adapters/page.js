@@ -1,4 +1,4 @@
-import {computeDivider, computeGravity, computeWidth, computeHeight, computeScale} from '../layouts/layout'
+import {computeDivider, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from '../layouts/layout'
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context, next) {
@@ -21,7 +21,7 @@ export default function(element, context, next) {
     var linearLayoutIndex
     var snapshot
 
-    function layout({x, y, width, height, gravity, scale}) {
+    function layout({x, y, width, height, gravity, scale, rotate}) {
         if (x != null || y != null) {
             // absolute layout
             x = x || 0
@@ -30,6 +30,7 @@ export default function(element, context, next) {
             const computedWidth = computeWidth(position, margins, undefined, width, computedScale)
             const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
             const computedGravity = computeGravity(position, margins, innerHeight, undefined, gravity, computedWidth, computedHeight)
+            const computedRotate = computeRotate(rotate)
 
             return {
                 x: position.x + margins.left + computedGravity.left + x,
@@ -37,6 +38,7 @@ export default function(element, context, next) {
                 width: computedWidth,
                 height: computedHeight,
                 scale: computedScale,
+                rotate: computedRotate,
                 after: function() {
                 }
             }

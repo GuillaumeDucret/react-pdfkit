@@ -22,10 +22,10 @@ function computeCentroidGravity(gravity = '', width, height) {
 }
 
 export default function(element, context, next) {
-    const {children, x, y, width, height, gravity, scale = 1, ...props} = element.props
+    const {children, x, y, width, height, gravity, scale = 1, rotate, ...props} = element.props
     const {doc, layout} = context
 
-    const position = layout({x, y, width, height, gravity, scale})
+    const position = layout({x, y, width, height, gravity, scale, rotate})
 
     function nextLayout({x = 0, y = 0, width, height, gravity}) {
         const computedWidth = computeWidth(position, undefined, undefined, width, undefined)
@@ -38,6 +38,7 @@ export default function(element, context, next) {
             width: computedWidth,
             height: computedHeight,
             scale: position.scale,
+            rotate: position.rotate,
             after: function() {
             }
         }

@@ -1,5 +1,5 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins, computeGravity, computeDivider, computeWidth, computeHeight, computeScale} from './layout'
+import {computeMargins, computeGravity, computeDivider, computeWidth, computeHeight, computeScale, computeRotate} from './layout'
 
 export default function(element, context, next) {
     const {children, x, y, width, height, gravity, orientation, margin, margins, divider, ...props} = element.props
@@ -19,11 +19,12 @@ export default function(element, context, next) {
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
-    function nextLayout({x, y, width, height, gravity, scale}) {
+    function nextLayout({x, y, width, height, gravity, scale, rotate}) {
         const computedScale = computeScale(position, computedMargins, computedDivider, width, scale)
         const computedWidth = computeWidth(position, computedMargins, computedDivider, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
         const computedGravity = computeGravity(position, computedMargins, innerHeight, orientation, gravity, computedWidth, computedHeight)
+        const computedRotate = computeRotate(rotate)
 
         layoutIndex++
 
@@ -40,6 +41,7 @@ export default function(element, context, next) {
                 width: computedWidth,
                 height: computedHeight,
                 scale: computedScale,
+                rotate: computedRotate,
                 after: function() {
                     innerHeight = computeInnerHeight(this.height)
                     doc.x = doc.x + this.width
@@ -55,6 +57,7 @@ export default function(element, context, next) {
             width: computedWidth,
             height: computedHeight,
             scale: computedScale,
+            rotate: computedRotate,
             after: function() {
                 innerHeight = computeInnerHeight(this.height)
                 doc.x = this.x

@@ -103,3 +103,21 @@ export function computeScale(position, margins = {top: 0, bottom: 0, left: 0, ri
 
     return scale
 }
+
+export function computeRotate(rotate) {
+    if (rotate == null) {
+        return {
+            angle: 0,
+            origin: [0, 0]
+        }
+    }
+
+    if (typeof rotate == 'number') {
+        return {
+            angle: rotate,
+            origin: [0, 0]
+        }
+    }
+
+    return rotate
+}

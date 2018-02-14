@@ -1,7 +1,7 @@
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context, next) {
-    const {children, x, y, width, height, gravity, rotate = 0, ...props} = element.props
+    const {children, x, y, width, height, gravity, rotate, ...props} = element.props
     const {doc, layout} = context
 
     doc.save()
@@ -13,9 +13,9 @@ export default function(element, context, next) {
         return doc.heightOfString(childNodes.join(''), {width, ...props})
     }
 
-    const position = layout({x, y, width, height: height || computeHeight, gravity})
+    const position = layout({x, y, width, height: height || computeHeight, gravity, rotate})
 
-    doc.rotate(rotate, {origin: [position.x, position.y]})
+    doc.rotate(position.rotate.angle, {origin: [position.x + position.rotate.origin[0], position.y + position.rotate.origin[1]]})
     doc.text(childNodes.join(''), position.x, position.y, {width: position.width, ...props, ...position.option})
     doc.y = !position.height && doc.y || position.y
 

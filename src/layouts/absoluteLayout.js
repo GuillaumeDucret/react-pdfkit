@@ -1,5 +1,5 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins, computeGravity, computeWidth, computeHeight, computeScale} from './layout'
+import {computeMargins, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from './layout'
 
 const BEFORE_PAGEBREAK_FILTER = (component) => {
     return component.props.pageBreak == 'before'
@@ -21,11 +21,12 @@ export default function(element, context, next) {
         return newInnerHeight > innerHeight && newInnerHeight || innerHeight
     }
 
-    function nextLayout({x = 0, y = 0, width, height, gravity, scale}) {
+    function nextLayout({x = 0, y = 0, width, height, gravity, scale, rotate}) {
         const computedScale = computeScale(position, computedMargins, undefined, width, scale)
         const computedWidth = computeWidth(position, computedMargins, undefined, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
         const computedGravity = computeGravity(position, computedMargins, innerHeight, undefined, gravity, computedWidth, computedHeight)
+        const computedRotate = computeRotate(rotate)
 
         return {
             x: doc.x = position.x + computedMargins.left + computedGravity.left + x,
@@ -33,6 +34,7 @@ export default function(element, context, next) {
             width: computedWidth,
             height: computedHeight,
             scale: computedScale,
+            rotate: computedRotate,
             after: function() {
                 innerHeight = computeInnerHeight(this.height)
                 doc.x = position.x + computedMargins.left
