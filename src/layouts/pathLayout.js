@@ -1,3 +1,4 @@
+import {product, matrix, point, rotation, scaling} from '../core/matrix'
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
 import {computeWidth, computeHeight} from './layout'
 
@@ -32,9 +33,16 @@ export default function(element, context, next) {
         const computedHeight = computeHeight(undefined, height, computedWidth, undefined)
         const computedGravity = computeCentroidGravity(gravity, computedWidth, computedHeight)
 
+        var transformedX = 0
+        var transformedY = 0
+        if (x || y) {
+            // transform
+            [transformedX, transformedY] = point(product(scaling(position.scale), ...rotation(position.rotate.angle, position.rotate.origin), matrix([x, y])))
+        }
+
         return {
-            x: doc.x = position.x + computedGravity.left + (x * position.scale),
-            y: doc.y = position.y + computedGravity.top + (y * position.scale),
+            x: doc.x = position.x + computedGravity.left + transformedX,
+            y: doc.y = position.y + computedGravity.top + transformedY,
             width: computedWidth,
             height: computedHeight,
             scale: position.scale,

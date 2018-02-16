@@ -17,6 +17,6 @@ export default function(element, context) {
 
     revertDocProperties(doc, snapshot)
     doc.restore()
-    
+
     position.after()
 }
