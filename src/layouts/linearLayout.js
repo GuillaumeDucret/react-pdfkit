@@ -3,7 +3,7 @@ import {computeMargins, computeGravity, computeDivider, computeWidth, computeHei
 
 export default function(element, context, next) {
     const {children, x, y, width, height, gravity, orientation, margin, margins, divider, ...props} = element.props
-    const {doc, layout, pageBreak} = context
+    const {doc, layout, breakPage} = context
 
     const computedMargins = computeMargins(margin, margins)
     const computedDivider = computeDivider(children, orientation, divider)
@@ -66,8 +66,8 @@ export default function(element, context, next) {
         }
     }
 
-    function nextPageBreak(pos, beforePageBreak, afterPageBreak) {
-        return pageBreak(pos, () => {
+    function nextBreakPage(pos, beforePageBreak, afterPageBreak) {
+        return breakPage(pos, () => {
             beforePageBreak()
             after()
         }, () => {
@@ -79,7 +79,7 @@ export default function(element, context, next) {
     function nextLayoutWithPageBreak(option) {
         var position = nextLayout(option)
         
-        if (nextPageBreak(position, () => {}, () => {})) {
+        if (nextBreakPage(position, () => {}, () => {})) {
             position = nextLayout(option)
         }
         return position
@@ -107,6 +107,6 @@ export default function(element, context, next) {
     }
 
     before()
-    next({layout: nextLayoutWithPageBreak, pageBreak: nextPageBreak})
+    next({layout: nextLayoutWithPageBreak, breakPage: nextBreakPage})
     after()
 }

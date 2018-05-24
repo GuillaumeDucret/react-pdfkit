@@ -1,13 +1,9 @@
 import {applyDocProperties, revertDocProperties} from '../adapters/adapter'
-import {computeMargins, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from './layout'
-
-const BEFORE_PAGEBREAK_FILTER = (component) => {
-    return component.props.pageBreak == 'before'
-}
+import {BEFORE_PAGEBREAK_FILTER, AFTER_PAGEBREAK_FILTER, preventPageBreak, computeMargins, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from './layout'
 
 export default function(element, context, next) {
-    const {children, x, y, width, height, gravity, margin, margins, ...props} = element.props
-    const {doc, layout, pageBreak} = context
+    const {children, x, y, width, height, gravity, margin, margins, pageBreak, ...props} = element.props
+    const {doc, layout, breakPage} = context
 
     const computedMargins = computeMargins(margin, margins)
 
@@ -43,13 +39,14 @@ export default function(element, context, next) {
         }
     }
 
-    function nextPageBreak(pos, beforePageBreak, afterPageBreak) {
-        return pageBreak(pos, () => {
+    function nextBreakPage(pos, beforePageBreak, afterPageBreak) {
+        return breakPage(pos, () => {
             beforePageBreak()
-            next({layout: nextLayout, pageBreak: () => false}, BEFORE_PAGEBREAK_FILTER)
+            next({layout: nextLayout, breakPage: () => false}, BEFORE_PAGEBREAK_FILTER)
             after()
         }, () => {
             before()
+            next({layout: nextLayout, breakPage: () => false}, AFTER_PAGEBREAK_FILTER)
             afterPageBreak()
         })
     }
@@ -57,7 +54,7 @@ export default function(element, context, next) {
     function nextLayoutWithPageBreak(option) {
         var position = nextLayout(option)
         
-        if (nextPageBreak(position, () => {}, () => {})) {
+        if (!preventPageBreak(pageBreak) && nextBreakPage(position, () => {}, () => {})) {
             position = nextLayout(option)
         }
         return position
@@ -84,6 +81,6 @@ export default function(element, context, next) {
     }
 
     before()
-    next({layout: nextLayoutWithPageBreak, pageBreak: nextPageBreak})
+    next({layout: nextLayoutWithPageBreak, breakPage: nextBreakPage})
     after()
 }

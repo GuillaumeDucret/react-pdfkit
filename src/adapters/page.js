@@ -1,14 +1,14 @@
-import {computeDivider, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from '../layouts/layout'
+import {BEFORE_PAGEBREAK_FILTER, AFTER_PAGEBREAK_FILTER, computeMargins, computeDivider, computeGravity, computeWidth, computeHeight, computeScale, computeRotate} from '../layouts/layout'
 import {applyDocProperties, revertDocProperties} from './adapter'
 
 export default function(element, context, next) {
-    const {children, divider, ...props} = element.props
+    const {children, divider, margin, margins, ...props} = element.props
     const {doc} = context
 
-    doc.addPage(props)
+    doc.addPage({margin: 0, ...props}) // Avoid automatic page break
 
     const page = doc.page
-    const margins = page.margins
+    const computedMargins = computeMargins(margin, margins)
     const computedDivider = computeDivider(children, undefined, divider)
     const position = {
         x: 0,
@@ -16,7 +16,7 @@ export default function(element, context, next) {
         width: page.width,
         height: page.height
     }
-    const innerHeight = position.height - margins.top - margins.bottom
+    const innerHeight = position.height - computedMargins.top - computedMargins.bottom
 
     var linearLayoutIndex
     var snapshot
@@ -26,15 +26,15 @@ export default function(element, context, next) {
             // absolute layout
             x = x || 0
             y = y || 0
-            const computedScale = computeScale(position, margins, undefined, width, scale)
-            const computedWidth = computeWidth(position, margins, undefined, width, computedScale)
+            const computedScale = computeScale(position, computedMargins, undefined, width, scale)
+            const computedWidth = computeWidth(position, computedMargins, undefined, width, computedScale)
             const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-            const computedGravity = computeGravity(position, margins, innerHeight, undefined, gravity, computedWidth, computedHeight)
+            const computedGravity = computeGravity(position, computedMargins, innerHeight, undefined, gravity, computedWidth, computedHeight)
             const computedRotate = computeRotate(rotate)
 
             return {
-                x: position.x + margins.left + computedGravity.left + x,
-                y: position.y + margins.top + computedGravity.top + y,
+                x: position.x + computedMargins.left + computedGravity.left + x,
+                y: position.y + computedMargins.top + computedGravity.top + y,
                 width: computedWidth,
                 height: computedHeight,
                 scale: computedScale,
@@ -47,13 +47,13 @@ export default function(element, context, next) {
         linearLayoutIndex++
 
         // linear layout
-        const computedScale = computeScale(position, margins, computedDivider, width, scale)
-        const computedWidth = computeWidth(position, margins, computedDivider, width, computedScale)
+        const computedScale = computeScale(position, computedMargins, computedDivider, width, scale)
+        const computedWidth = computeWidth(position, computedMargins, computedDivider, width, computedScale)
         const computedHeight = computeHeight(innerHeight, height, computedWidth, computedScale)
-        const computedGravity = computeGravity(position, margins, innerHeight, undefined, gravity, computedWidth, computedHeight)
+        const computedGravity = computeGravity(position, computedMargins, innerHeight, undefined, gravity, computedWidth, computedHeight)
 
         return {
-            x: doc.x = position.x + margins.left + computedGravity.left,
+            x: doc.x = position.x + computedMargins.left + computedGravity.left,
             y: doc.y = doc.y + (linearLayoutIndex > 0 && computedDivider.height),
             width: computedWidth,
             height: computedHeight,
@@ -65,15 +65,17 @@ export default function(element, context, next) {
         }
     }
 
-    function pageBreak(pos, beforePageBreak, afterPageBreak) {
-        if (pos.y + pos.height > position.height - margins.bottom) {
+    function breakPage(pos, beforePageBreak, afterPageBreak) {
+        if (pos.y + pos.height > position.height - computedMargins.bottom) {
             beforePageBreak()
+            next({layout: layout, breakPage: () => false}, BEFORE_PAGEBREAK_FILTER)
             after()
 
             // break page
-            doc.addPage(props)
+            doc.addPage({margin: 0, ...props}) // Avoid automatic page break
 
             before()
+            next({layout: layout, breakPage: () => false}, AFTER_PAGEBREAK_FILTER)
             afterPageBreak()
             return true
         }
@@ -83,7 +85,7 @@ export default function(element, context, next) {
     function layoutWithPageBreak(option) {
         var position = layout(option)
         
-        if (pageBreak(position, () => {}, () => {})) {
+        if (breakPage(position, () => {}, () => {})) {
             position = layout(option)
         }
         return position
@@ -92,8 +94,8 @@ export default function(element, context, next) {
     function before() {
         linearLayoutIndex = -1
 
-        doc.x = position.x + margins.left
-        doc.y = position.y + margins.top
+        doc.x = position.x + computedMargins.left
+        doc.y = position.y + computedMargins.top
 
         doc.save()
         snapshot = applyDocProperties(doc, props)
@@ -108,6 +110,6 @@ export default function(element, context, next) {
     }
 
     before()
-    next({layout: layoutWithPageBreak, pageBreak: pageBreak})
+    next({layout: layoutWithPageBreak, breakPage: breakPage})
     after()
 }

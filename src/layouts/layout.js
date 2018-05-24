@@ -1,3 +1,17 @@
+export const BEFORE_PAGEBREAK_FILTER = (component) => {
+    const pageBreak = component.props.pageBreak
+    return pageBreak && pageBreak.split('|').indexOf('before') >= 0
+}
+
+export const AFTER_PAGEBREAK_FILTER = (component) => {
+    const pageBreak = component.props.pageBreak
+    return pageBreak && pageBreak.split('|').indexOf('after') >= 0
+}
+
+export function preventPageBreak(pageBreak) {
+    return pageBreak && pageBreak.split('|').indexOf('prevent') >= 0
+}
+
 export function computeMargins(margin = 0, margins = {}) {
     const defaultMargins = {
         top: margin,
